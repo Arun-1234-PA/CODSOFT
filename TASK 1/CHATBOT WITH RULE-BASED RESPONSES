@@ -1,0 +1,34 @@
+import re
+
+def parse_input(user_input):
+    match = re.match(r'(\d+)\s*([\+\-\*/])\s*(\d+)', user_input)
+    if match:
+        num1, operator, num2 = match.groups()
+        return int(num1), operator, int(num2)
+    else:
+        return None, None, None
+
+def calculator_response(user_input):
+    num1, operator, num2 = parse_input(user_input)
+
+    if operator == '+':
+        return f"The result is: {num1 + num2}"
+    elif operator == '-':
+        return f"The result is: {num1 - num2}"
+    elif operator == '*':
+        return f"The result is: {num1 * num2}"
+    elif operator == '/':
+        if num2 != 0:
+            return f"The result is: {num1 / num2}"
+        else:
+            return "Error: Division by zero is not allowed."
+    else:
+        return "Sorry, I didn't understand that. Please use the format: number operator number (e.g., 2 + 2)."
+
+while True:
+    user_input = input("You: ")
+    if user_input.lower() in ["bye", "exit", "quit"]:
+        print("Chatbot: Goodbye! Have a great day!")
+        break
+    response = calculator_response(user_input)
+    print("Chatbot:", response)
