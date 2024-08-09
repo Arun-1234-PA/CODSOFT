@@ -1,1 +1,14 @@
-
+You: 2+3
+Chatbot: The result is: 5
+You: 2*3
+Chatbot: The result is: 6
+You: 100/4
+Chatbot: The result is: 25.0
+You: 5-3
+Chatbot: The result is: 2
+You: 4/0
+Chatbot: Error: Division by zero is not allowed.
+You: 3//4
+Chatbot: Sorry, I didn't understand that. Please use the format: number operator number (e.g., 2 + 2).
+You: exit
+Chatbot: Goodbye! Have a great day!
