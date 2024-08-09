@@ -1,0 +1,52 @@
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
+data = {
+    'user_id': [1, 1, 1, 2, 2, 3, 3, 4, 4, 4],
+    'product_id': ['P1', 'P2', 'P3', 'P2', 'P3', 'P1', 'P3', 'P1', 'P2', 'P4'],
+    'rating': [5, 3, 4, 4, 5, 2, 3, 4, 5, 1]
+}
+
+
+ratings_df = pd.DataFrame(data)
+
+
+user_product_matrix = ratings_df.pivot_table(index='user_id', columns='product_id', values='rating')
+
+
+user_product_matrix_filled = user_product_matrix.fillna(0)
+
+
+user_similarity = cosine_similarity(user_product_matrix_filled)
+user_similarity_df = pd.DataFrame(user_similarity, index=user_product_matrix.index, columns=user_product_matrix.index)
+
+def get_product_recommendations(user_ids, user_product_matrix, user_similarity_df, n_recommendations=3):
+    recommendations = {}
+    for user_id in user_ids:
+        
+        similar_users = user_similarity_df[user_id].sort_values(ascending=False).index[1:]
+
+       
+        weighted_ratings = {}
+        for similar_user in similar_users:
+            similarity_score = user_similarity_df.loc[user_id, similar_user]
+            for product in user_product_matrix.columns:
+                if not np.isnan(user_product_matrix.loc[similar_user, product]) and np.isnan(user_product_matrix.loc[user_id, product]):
+                    if product not in weighted_ratings:
+                        weighted_ratings[product] = 0
+                    weighted_ratings[product] += user_product_matrix.loc[similar_user, product] * similarity_score
+
+        
+        recommendations[user_id] = sorted(weighted_ratings.items(), key=lambda x: x[1], reverse=True)[:n_recommendations]
+
+    return recommendations
+
+
+user_ids = [1, 2, 3, 4]
+recommendations = get_product_recommendations(user_ids, user_product_matrix, user_similarity_df, n_recommendations=2)
+
+
+for user_id, products in recommendations.items():
+    product_list = ', '.join([product for product, score in products])
+    print(f"Recommended products for user {user_id}: {product_list}")
